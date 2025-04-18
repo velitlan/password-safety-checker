@@ -33,7 +33,7 @@ def main():
     if count:
         print(f"Dein Passwort wurde {count} mal in Datenleaks gefunden. Ändere es unbedingt!")
     else:
-        print("✅ Dein Passwort wurde bisher nicht geleakt.")
+        print("Dein Passwort wurde bisher nicht geleakt.")
 
 if __name__ == "__main__":
     main()
