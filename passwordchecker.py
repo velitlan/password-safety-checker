@@ -1,6 +1,24 @@
 import requests
 import hashlib
 import re
+import secrets
+import string
+import msvcrt
+
+#Passwortvorschlag
+def frage_nach_vorschlag():
+    print("\nHättest du gerne ein sicheres Passwort vorgeschlagen? (y/n)")
+
+    taste = msvcrt.getch().decode('utf-8').lower()
+    if taste == 'y':
+        def generate_strong_password(length=16):
+             characters = string.ascii_letters + string.digits + string.punctuation
+             return ''.join(secrets.choice(characters) for _ in range(length))
+        neues_passwort = generate_strong_password()
+        print("\nHier dein sicherer Passwortvorschlag:")
+        print(neues_passwort)
+    else:
+        print("\nOkay.")
 
 #Umwandlung des Passworts in SHA1-Hash
 def hash_password(password):
@@ -90,8 +108,9 @@ def main():
     print("\nLeak-Check:")
     if count:
         print(f"Dein Passwort wurde {count} Mal in Datenleaks gefunden. Ändere es dringend.")
+        frage_nach_vorschlag()
     else:
-        print("Dein Passwort wurde bisher nicht geleakt.")
+              print("Dein Passwort wurde bisher nicht geleakt.")
 
 #Programmstart
 if __name__ == "__main__":
