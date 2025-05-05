@@ -7,7 +7,7 @@ import msvcrt
 
 #Passwortvorschlag
 def frage_nach_vorschlag():
-    print("\nHättest du gerne ein sicheres Passwort vorgeschlagen? (y/n)")
+    print("\nMöchtest du ein sicheres Passwort automatisch generieren lassen? (y/n)")
 
     taste = msvcrt.getch().decode('utf-8').lower()
     if taste == 'y':
