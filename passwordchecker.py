@@ -5,7 +5,7 @@ import secrets
 import string
 import msvcrt
 
-#Passwortvorschlag
+#Fragt den Nutzer, ob ein starkes Passwort generiert werden soll
 def frage_nach_vorschlag():
     print("\nMöchtest du ein sicheres Passwort automatisch generieren lassen? (y/n)")
 
@@ -20,12 +20,12 @@ def frage_nach_vorschlag():
     else:
         print("\nOkay.")
 
-#Umwandlung des Passworts in SHA1-Hash
+#Wandelt das Passwort in einen SHA1-Hash um und teilt ihn in zwei Teile
 def hash_password(password):
     sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
     return sha1[:5], sha1[5:]
 
-#Abfrage bei der PwnedPasswords API
+#Fragt bei der PwnedPasswords-API an, ob Teile des Passwort-Hashes bekannt sind
 def check_pwned_api(prefix):
     url = f"https://api.pwnedpasswords.com/range/{prefix}"
     response = requests.get(url)
@@ -33,7 +33,7 @@ def check_pwned_api(prefix):
         raise RuntimeError(f"API-Fehler: {response.status_code}")
     return response.text
 
-#Prüfung des Passworts auf Datenleaks
+#Vergleicht den Hash mit bekannten geleakten Passwörtern
 def is_password_pwned(password):
     prefix, suffix = hash_password(password)
     hashes = check_pwned_api(prefix)
@@ -44,12 +44,12 @@ def is_password_pwned(password):
             return int(count)
     return 0
 
-#Bewertung der Passwortstärke
+#Bewertet, wie sicher das Passwort ist (nach einfachen Kriterien)
 def bewertung_passwort(passwort):
     punkte = 0
     feedback = []
 
-    #Länge
+    #Länge prüfen
     if len(passwort) >= 12:
         punkte += 2
         feedback.append("Gute Länge (12+ Zeichen)")
@@ -59,7 +59,7 @@ def bewertung_passwort(passwort):
     else:
         feedback.append("Zu kurz (unter 8 Zeichen)")
 
-    #Klein- und Großbuchstaben
+    #Klein- und Großbuchstaben prüfen
     if re.search(r'[a-z]', passwort):
         punkte += 1
     else:
@@ -70,19 +70,19 @@ def bewertung_passwort(passwort):
     else:
         feedback.append("Keine Großbuchstaben")
     
-    #Zahlen
+    #Zahlen prüfen
     if re.search(r'[0-9]', passwort):
         punkte += 1
     else:
         feedback.append("Keine Zahlen")
     
-    #Sonderzeichen
+    #Sonderzeichen prüfen
     if re.search(r'[\W_]', passwort):
         punkte += 1
     else:
         feedback.append("Keine Sonderzeichen")
 
-    #Bewertung
+    #Endbewertung
     if punkte >= 6:
         stufe = "Starkes Passwort"
     elif punkte >= 4:
@@ -92,26 +92,26 @@ def bewertung_passwort(passwort):
 
     return stufe, feedback
 
-#Hauptfunktion
+#Startpunkt des Programms
 def main():
     password = input("Gib dein Passwort ein:\n")
 
-    #Stärke bewerten
+    #Passwortstärke anzeigen
     stufe, infos = bewertung_passwort(password)
     print("\nPasswortbewertung:")
     print(stufe)
     for zeile in infos:
         print("-", zeile)
 
-    #Prüfung auf Datenleaks
+    #Prüfen, ob das Passwort schon mal geleakt wurde
     count = is_password_pwned(password)
     print("\nLeak-Check:")
     if count:
         print(f"Dein Passwort wurde {count} Mal in Datenleaks gefunden. Ändere es dringend.")
         frage_nach_vorschlag()
     else:
-              print("Dein Passwort wurde bisher nicht geleakt.")
+        print("Dein Passwort wurde bisher nicht geleakt.")
 
-#Programmstart
+#Startet das Programm nur, wenn die Datei direkt ausgeführt wird
 if __name__ == "__main__":
     main()
